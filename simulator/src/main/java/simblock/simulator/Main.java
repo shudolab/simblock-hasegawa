@@ -143,28 +143,8 @@ public class Main {
         // Setup network
         constructNetworkWithAllNodes(NUM_OF_NODES);
 
-        // Initial block height, we stop at END_BLOCK_HEIGHT
-        int currentBlockHeight = 1;
-
-        // Iterate over tasks and handle
-        while (getTask() != null) {
-            if (getTask() instanceof AbstractMintingTask) {
-                AbstractMintingTask task = (AbstractMintingTask) getTask();
-                if (task.getParent().getHeight() == currentBlockHeight) {
-                    currentBlockHeight++;
-                }
-                if (currentBlockHeight > END_BLOCK_HEIGHT) {
-                    break;
-                }
-                // Log every 100 blocks and at the second block
-                // TODO use constants here
-                if (currentBlockHeight % 100 == 0 || currentBlockHeight == 2) {
-                    writeGraph(currentBlockHeight);
-                }
-            }
-            // Execute task
-            runTask();
-        }
+        // Simulate network
+        simulationMain();
 
         // Print propagation information about all blocks
         printAllPropagation();
@@ -254,6 +234,32 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
         // Log simulation time in milliseconds
         System.out.println(simulationTime);
 
+    }
+
+    /* Main loop of the simulation */
+    public static void simulationMain() {
+        // Initial block height, we stop at END_BLOCK_HEIGHT
+        int currentBlockHeight = 1;
+
+        // Iterate over tasks and handle
+        while (getTask() != null) {
+            if (getTask() instanceof AbstractMintingTask) {
+                AbstractMintingTask task = (AbstractMintingTask) getTask();
+                if (task.getParent().getHeight() == currentBlockHeight) {
+                    currentBlockHeight++;
+                }
+                if (currentBlockHeight > END_BLOCK_HEIGHT) {
+                    break;
+                }
+                // Log every 100 blocks and at the second block
+                // TODO use constants here
+                if (currentBlockHeight % 100 == 0 || currentBlockHeight == 2) {
+                    writeGraph(currentBlockHeight);
+                }
+            }
+            // Execute task
+            runTask();
+        }
     }
 
 
