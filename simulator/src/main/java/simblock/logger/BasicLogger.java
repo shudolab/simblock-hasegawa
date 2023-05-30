@@ -40,9 +40,6 @@ public class BasicLogger implements Closeable {
 
     public void log(String message) {
         this.writer.print(message);
-    }
-
-    public void flush() {
         this.writer.flush();
     }
 
