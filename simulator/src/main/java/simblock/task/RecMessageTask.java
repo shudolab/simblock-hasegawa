@@ -25,30 +25,30 @@ import simblock.node.Node;
 
 public class RecMessageTask extends AbstractMessageTask {
 
-  /**
-   * The block to  be received.
-   */
-  private final Block block;
+    /**
+     * The block to be received.
+     */
+    private final Block block;
 
-  /**
-   * Instantiates a new Rec message task.
-   *
-   * @param from  the sending node
-   * @param to    the receiving node
-   * @param block the block to be received
-   */
-  public RecMessageTask(Node from, Node to, Block block) {
-    super(from, to);
-    this.block = block;
-  }
+    /**
+     * Instantiates a new Rec message task.
+     *
+     * @param from  the sending node
+     * @param to    the receiving node
+     * @param block the block to be received
+     */
+    public RecMessageTask(Node from, Node to, Block block) {
+        super(from, to);
+        this.block = block;
+    }
 
-  /**
-   * Gets the block to be received.
-   *
-   * @return the block
-   */
-  public Block getBlock() {
-    return this.block;
-  }
+    /**
+     * Gets the block to be received.
+     *
+     * @return the block
+     */
+    public Block getBlock() {
+        return this.block;
+    }
 
 }

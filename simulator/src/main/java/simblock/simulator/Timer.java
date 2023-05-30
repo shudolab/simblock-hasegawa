@@ -29,153 +29,153 @@ import simblock.task.Task;
  */
 public class Timer {
 
-  /**
-   * A sorted queue of scheduled tasks.
-   */
-  private static final PriorityQueue<ScheduledTask> taskQueue = new PriorityQueue<>();
-
-  /**
-   * A map containing a mapping of all tasks to their ScheduledTask counterparts. When
-   * executed, the key - value
-   * pair is to be removed from the mapping.
-   */
-  //TODO a bit redundant since Task is again stored in ScheduledTask. Is there a better approach?
-  private static final Map<Task, ScheduledTask> taskMap = new HashMap<>();
-  /**
-   * Initial simulation time in milliseconds.
-   */
-  //TODO is it milliseconds?
-  private static long currentTime = 0L;
-
-  /**
-   * Represents a {@link Task} that is scheduled to be executed.
-   */
-  private static class ScheduledTask implements Comparable<ScheduledTask> {
-    private final Task task;
-    private final long scheduledTime;
+    /**
+     * A sorted queue of scheduled tasks.
+     */
+    private static final PriorityQueue<ScheduledTask> taskQueue = new PriorityQueue<>();
 
     /**
-     * Instantiates a new ScheduledTask.
-     *
-     * @param task          - the task to be executed
-     * @param scheduledTime - the simulation time at which the task is to be executed
+     * A map containing a mapping of all tasks to their ScheduledTask counterparts. When
+     * executed, the key - value
+     * pair is to be removed from the mapping.
      */
-    private ScheduledTask(Task task, long scheduledTime) {
-      this.task = task;
-      this.scheduledTime = scheduledTime;
+    //TODO a bit redundant since Task is again stored in ScheduledTask. Is there a better approach?
+    private static final Map<Task, ScheduledTask> taskMap = new HashMap<>();
+    /**
+     * Initial simulation time in milliseconds.
+     */
+    //TODO is it milliseconds?
+    private static long currentTime = 0L;
+
+    /**
+     * Represents a {@link Task} that is scheduled to be executed.
+     */
+    private static class ScheduledTask implements Comparable<ScheduledTask> {
+        private final Task task;
+        private final long scheduledTime;
+
+        /**
+         * Instantiates a new ScheduledTask.
+         *
+         * @param task          - the task to be executed
+         * @param scheduledTime - the simulation time at which the task is to be executed
+         */
+        private ScheduledTask(Task task, long scheduledTime) {
+            this.task = task;
+            this.scheduledTime = scheduledTime;
+        }
+
+        /**
+         * Gets the task.
+         *
+         * @return the {@link Task} instance
+         */
+        private Task getTask() {
+            return this.task;
+        }
+
+        /**
+         * Gets the scheduled time at which the task is to be executed.
+         *
+         * @return the scheduled time
+         */
+        private long getScheduledTime() {
+            return this.scheduledTime;
+        }
+
+        /**
+         * Compares the two scheduled tasks.
+         *
+         * @param o other task
+         * @return 1 if self is executed later, 0 if concurrent and -1 if self is to be executed before.
+         */
+        public int compareTo(ScheduledTask o) {
+            if (this.equals(o)) {
+                return 0;
+            }
+            int order = Long.signum(this.scheduledTime - o.scheduledTime);
+            if (order != 0) {
+                return order;
+            }
+            order = System.identityHashCode(this) - System.identityHashCode(o);
+            return order;
+        }
     }
 
     /**
-     * Gets the task.
-     *
-     * @return the {@link Task} instance
+     * Runs a {@link ScheduledTask}.
      */
-    private Task getTask() {
-      return this.task;
+    public static void runTask() {
+        // If there are any tasks
+        if (taskQueue.size() > 0) {
+            // Get the next ScheduledTask
+            ScheduledTask currentScheduledTask = taskQueue.poll();
+            Task currentTask = currentScheduledTask.getTask();
+            currentTime = currentScheduledTask.getScheduledTime();
+            // Remove the task from the mapping of all tasks
+            taskMap.remove(currentTask, currentScheduledTask);
+            // Execute
+            currentTask.run();
+        }
     }
 
     /**
-     * Gets the scheduled time at which the task is to be executed.
+     * Remove task from the mapping of all tasks and from the execution queue.
      *
-     * @return the scheduled time
+     * @param task the task to be removed
      */
-    private long getScheduledTime() {
-      return this.scheduledTime;
+    public static void removeTask(Task task) {
+        if (taskMap.containsKey(task)) {
+            ScheduledTask scheduledTask = taskMap.get(task);
+            taskQueue.remove(scheduledTask);
+            taskMap.remove(task, scheduledTask);
+        }
     }
 
     /**
-     * Compares the two scheduled tasks.
+     * Get the {@link Task} from the execution queue to be executed next.
      *
-     * @param o other task
-     * @return 1 if self is executed later, 0 if concurrent and -1 if self is to be executed before.
+     * @return the task from the queue or null if task queue is empty.
      */
-    public int compareTo(ScheduledTask o) {
-      if (this.equals(o)) {
-        return 0;
-      }
-      int order = Long.signum(this.scheduledTime - o.scheduledTime);
-      if (order != 0) {
-        return order;
-      }
-      order = System.identityHashCode(this) - System.identityHashCode(o);
-      return order;
+    public static Task getTask() {
+        if (taskQueue.size() > 0) {
+            ScheduledTask currentTask = taskQueue.peek();
+            return currentTask.getTask();
+        } else {
+            return null;
+        }
     }
-  }
 
-  /**
-   * Runs a {@link ScheduledTask}.
-   */
-  public static void runTask() {
-    // If there are any tasks
-    if (taskQueue.size() > 0) {
-      // Get the next ScheduledTask
-      ScheduledTask currentScheduledTask = taskQueue.poll();
-      Task currentTask = currentScheduledTask.getTask();
-      currentTime = currentScheduledTask.getScheduledTime();
-      // Remove the task from the mapping of all tasks
-      taskMap.remove(currentTask, currentScheduledTask);
-      // Execute
-      currentTask.run();
+    /**
+     * Schedule task to be executed at the current time incremented by the task duration.
+     *
+     * @param task the task
+     */
+    public static void putTask(Task task) {
+        ScheduledTask scheduledTask = new ScheduledTask(task, currentTime + task.getInterval());
+        taskMap.put(task, scheduledTask);
+        taskQueue.add(scheduledTask);
     }
-  }
 
-  /**
-   * Remove task from the mapping of all tasks and from the execution queue.
-   *
-   * @param task the task to be removed
-   */
-  public static void removeTask(Task task) {
-    if (taskMap.containsKey(task)) {
-      ScheduledTask scheduledTask = taskMap.get(task);
-      taskQueue.remove(scheduledTask);
-      taskMap.remove(task, scheduledTask);
+    /**
+     * Schedule task to be executed at the provided absolute timestamp.
+     *
+     * @param task the task
+     * @param time the time in milliseconds
+     */
+    @SuppressWarnings("unused")
+    public static void putTaskAbsoluteTime(Task task, long time) {
+        ScheduledTask scheduledTask = new ScheduledTask(task, time);
+        taskMap.put(task, scheduledTask);
+        taskQueue.add(scheduledTask);
     }
-  }
 
-  /**
-   * Get the {@link Task} from the execution queue to be executed next.
-   *
-   * @return the task from the queue or null if task queue is empty.
-   */
-  public static Task getTask() {
-    if (taskQueue.size() > 0) {
-      ScheduledTask currentTask = taskQueue.peek();
-      return currentTask.getTask();
-    } else {
-      return null;
+    /**
+     * Get current time in milliseconds.
+     *
+     * @return the time
+     */
+    public static long getCurrentTime() {
+        return currentTime;
     }
-  }
-
-  /**
-   * Schedule task to be executed at the current time incremented by the task duration.
-   *
-   * @param task the task
-   */
-  public static void putTask(Task task) {
-    ScheduledTask scheduledTask = new ScheduledTask(task, currentTime + task.getInterval());
-    taskMap.put(task, scheduledTask);
-    taskQueue.add(scheduledTask);
-  }
-
-  /**
-   * Schedule task to be executed at the provided absolute timestamp.
-   *
-   * @param task the task
-   * @param time the time in milliseconds
-   */
-  @SuppressWarnings("unused")
-  public static void putTaskAbsoluteTime(Task task, long time) {
-    ScheduledTask scheduledTask = new ScheduledTask(task, time);
-    taskMap.put(task, scheduledTask);
-    taskQueue.add(scheduledTask);
-  }
-
-  /**
-   * Get current time in milliseconds.
-   *
-   * @return the time
-   */
-  public static long getCurrentTime() {
-    return currentTime;
-  }
 }

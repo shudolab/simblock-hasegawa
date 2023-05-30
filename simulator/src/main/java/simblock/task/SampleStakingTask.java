@@ -23,19 +23,18 @@ import simblock.block.SamplePoSBlock;
 import simblock.node.Node;
 
 public class SampleStakingTask extends AbstractMintingTask {
-  private final BigInteger difficulty;
+    private final BigInteger difficulty;
 
-  public SampleStakingTask(Node minter, long interval, BigInteger difficulty) {
-    super(minter, interval);
-    this.difficulty = difficulty;
-  }
+    public SampleStakingTask(Node minter, long interval, BigInteger difficulty) {
+        super(minter, interval);
+        this.difficulty = difficulty;
+    }
 
-  @Override
-  public void run() {
-    SamplePoSBlock createdBlock = new SamplePoSBlock(
-        (SamplePoSBlock) this.getParent(), this.getMinter(), getCurrentTime(),
-        this.difficulty
-    );
-    this.getMinter().receiveBlock(createdBlock);
-  }
+    @Override
+    public void run() {
+        SamplePoSBlock createdBlock = new SamplePoSBlock(
+                (SamplePoSBlock) this.getParent(), this.getMinter(), getCurrentTime(),
+                this.difficulty);
+        this.getMinter().receiveBlock(createdBlock);
+    }
 }

@@ -20,16 +20,16 @@ package simblock.task;
  * The interface Task. A task can be run and has its execution duration.
  */
 public interface Task {
-  /**
-   * Gets the execution duration of the task in milliseconds of simulated time.
-   *
-   * @return the execution duration of the task
-   */
-  // TODO this is not an interval this is a duration
-  long getInterval();
+    /**
+     * Gets the execution duration of the task in milliseconds of simulated time.
+     *
+     * @return the execution duration of the task
+     */
+    // TODO this is not an interval this is a duration
+    long getInterval();
 
-  /**
-   * Run the task.
-   */
-  void run();
+    /**
+     * Run the task.
+     */
+    void run();
 }

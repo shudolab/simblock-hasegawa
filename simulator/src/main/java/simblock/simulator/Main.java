@@ -358,7 +358,6 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
             logger.log("\"region-id\":" + regionList.get(id - 1));
             logger.log("}");
             logger.log("},");
-
         }
 
         // Link newly generated nodes

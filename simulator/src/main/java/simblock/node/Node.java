@@ -418,22 +418,22 @@ public class Node {
             }
         }
 
-        if(message instanceof GetBlockTxnMessageTask){
+        if (message instanceof GetBlockTxnMessageTask){
             this.messageQue.add((GetBlockTxnMessageTask) message);
-            if(!sendingBlock){
+            if (!sendingBlock){
                 this.sendNextBlockMessage();
             }
         }
 
-        if(message instanceof CmpctBlockMessageTask){
+        if (message instanceof CmpctBlockMessageTask){
             Block block = ((CmpctBlockMessageTask) message).getBlock();
             Random random = new Random();
             float CBRfailureRate = this.isChurnNode ? CBR_FAILURE_RATE_FOR_CHURN_NODE : CBR_FAILURE_RATE_FOR_CONTROL_NODE;
             boolean success = random.nextDouble() > CBRfailureRate ? true : false;
-            if(success){
+            if (success){
                 downloadingBlocks.remove(block);
                 this.receiveBlock(block);
-            }else{
+            } else {
                 AbstractMessageTask task = new GetBlockTxnMessageTask(this, from, block);
                 putTask(task);
             }
@@ -452,10 +452,10 @@ public class Node {
      */
     private long getFailedBlockSize(){
         Random random = new Random();
-        if(this.isChurnNode){
+        if (this.isChurnNode){
             int index = random.nextInt(CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CHURN_NODE.length);
             return (long)(BLOCK_SIZE * CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CHURN_NODE[index]);
-        }else{
+        } else {
             int index = random.nextInt(CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CONTROL_NODE.length);
             return (long)(BLOCK_SIZE * CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CONTROL_NODE[index]);
         }
@@ -472,10 +472,10 @@ public class Node {
 
             AbstractMessageTask messageTask;
 
-            if(this.messageQue.get(0) instanceof RecMessageTask){
+            if (this.messageQue.get(0) instanceof RecMessageTask){
                 Block block = ((RecMessageTask) this.messageQue.get(0)).getBlock();
                 // If use compact block relay.
-                if(this.messageQue.get(0).getFrom().useCBR && this.useCBR) {
+                if (this.messageQue.get(0).getFrom().useCBR && this.useCBR) {
                     // Convert bytes to bits and divide by the bandwidth expressed as bit per millisecond, add
                     // processing time.
                     long delay = COMPACT_BLOCK_SIZE * 8 / (bandwidth / 1000) + processingTime;
@@ -487,7 +487,7 @@ public class Node {
                     long delay = BLOCK_SIZE * 8 / (bandwidth / 1000) + processingTime;
                     messageTask = new BlockMessageTask(this, to, block, delay);
                 }
-            } else if(this.messageQue.get(0) instanceof GetBlockTxnMessageTask) {
+            } else if (this.messageQue.get(0) instanceof GetBlockTxnMessageTask) {
                 // Else from requests missing transactions.
                 Block block = ((GetBlockTxnMessageTask) this.messageQue.get(0)).getBlock();
                 long delay = getFailedBlockSize() * 8 / (bandwidth / 1000) + processingTime;

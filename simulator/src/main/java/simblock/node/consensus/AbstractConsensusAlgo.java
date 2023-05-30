@@ -24,46 +24,46 @@ import simblock.task.AbstractMintingTask;
  * The type Abstract consensus algorithm.
  */
 public abstract class AbstractConsensusAlgo {
-  private final Node selfNode;
+    private final Node selfNode;
 
-  /**
-   * Instantiates a new Abstract consensus algo.
-   *
-   * @param selfNode the self node
-   */
-  public AbstractConsensusAlgo(Node selfNode) {
-    this.selfNode = selfNode;
-  }
+    /**
+     * Instantiates a new Abstract consensus algo.
+     *
+     * @param selfNode the self node
+     */
+    public AbstractConsensusAlgo(Node selfNode) {
+        this.selfNode = selfNode;
+    }
 
-  /**
-   * Gets the node using this consensus algorithm.
-   *
-   * @return the self node
-   */
-  public Node getSelfNode() {
-    return this.selfNode;
-  }
+    /**
+     * Gets the node using this consensus algorithm.
+     *
+     * @return the self node
+     */
+    public Node getSelfNode() {
+        return this.selfNode;
+    }
 
-  /**
-   * Minting abstract minting task.
-   *
-   * @return the abstract minting task
-   */
-  public abstract AbstractMintingTask minting();
+    /**
+     * Minting abstract minting task.
+     *
+     * @return the abstract minting task
+     */
+    public abstract AbstractMintingTask minting();
 
-  /**
-   * Tests if the receivedBlock is valid with regards to the current block.
-   *
-   * @param receivedBlock the received block
-   * @param currentBlock  the current block
-   * @return true if block is valid false otherwise
-   */
-  public abstract boolean isReceivedBlockValid(Block receivedBlock, Block currentBlock);
+    /**
+     * Tests if the receivedBlock is valid with regards to the current block.
+     *
+     * @param receivedBlock the received block
+     * @param currentBlock  the current block
+     * @return true if block is valid false otherwise
+     */
+    public abstract boolean isReceivedBlockValid(Block receivedBlock, Block currentBlock);
 
-  /**
-   * Gets the genesis block.
-   *
-   * @return the genesis block
-   */
-  public abstract Block genesisBlock();
+    /**
+     * Gets the genesis block.
+     *
+     * @return the genesis block
+     */
+    public abstract Block genesisBlock();
 }
