@@ -16,7 +16,6 @@
 
 package simblock.simulator;
 
-
 import static simblock.settings.SimulationConfiguration.ALGO;
 import static simblock.settings.SimulationConfiguration.AVERAGE_MINING_POWER;
 import static simblock.settings.SimulationConfiguration.END_BLOCK_HEIGHT;
@@ -53,6 +52,7 @@ import java.util.Set;
 import simblock.block.Block;
 import simblock.node.Node;
 import simblock.task.AbstractMintingTask;
+import simblock.logger.BasicLogger;
 
 
 /**
@@ -92,19 +92,24 @@ public class Main {
     //TODO use logger
     public static PrintWriter OUT_JSON_FILE;
 
-    /**
-     * The constant STATIC_JSON_FILE.
-     */
-    //TODO use logger
-    public static PrintWriter STATIC_JSON_FILE;
-
     static {
         try {
             OUT_JSON_FILE = new PrintWriter(
                     new BufferedWriter(new FileWriter(new File(OUT_FILE_URI.resolve("./output.json")))));
-            STATIC_JSON_FILE = new PrintWriter(
-                    new BufferedWriter(new FileWriter(new File(OUT_FILE_URI.resolve("./static.json")))));
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    static BasicLogger logger = BasicLogger.getLogger("simblock.output");
+
+    /* Setup global logger */
+    private static void setupLogger() {
+        try {
+            logger.setFileWriter(new File(OUT_FILE_URI.resolve("./output.json")));
+        }
+        catch(IOException e) {
             e.printStackTrace();
         }
     }
@@ -115,6 +120,8 @@ public class Main {
      * @param args the input arguments
      */
     public static void main(String[] args) {
+        setupLogger();
+
         final long start = System.currentTimeMillis();
         setTargetInterval(INTERVAL);
 
@@ -123,7 +130,15 @@ public class Main {
         OUT_JSON_FILE.flush();
 
         // Log regions
-        printRegion();
+        var staticLogger = BasicLogger.getLogger("simblock.static");
+        try {
+            staticLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./logger_static.json")));
+            printRegion();
+            staticLogger.close();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
 
         // Setup network
         constructNetworkWithAllNodes(NUM_OF_NODES);
