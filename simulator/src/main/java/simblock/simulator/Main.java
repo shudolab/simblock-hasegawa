@@ -54,7 +54,6 @@ import simblock.node.Node;
 import simblock.task.AbstractMintingTask;
 import simblock.logger.BasicLogger;
 
-
 /**
  * The type Main represents the entry point.
  */
@@ -91,9 +90,8 @@ public class Main {
     /* Setup global logger */
     private static void setupLogger() {
         try {
-            logger.setFileWriter(new File(OUT_FILE_URI.resolve("./logger_output.json")));
-        }
-        catch(IOException e) {
+            logger.setFileWriter(new File(OUT_FILE_URI.resolve("./output.json")));
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -109,17 +107,16 @@ public class Main {
         final long start = System.currentTimeMillis();
         setTargetInterval(INTERVAL);
 
-        //start json format
+        // start json format
         logger.log("[");
 
         // Log regions
         var staticLogger = BasicLogger.getLogger("simblock.static");
         try {
-            staticLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./logger_static.json")));
+            staticLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./static.json")));
             printRegion();
             staticLogger.close();
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -132,7 +129,7 @@ public class Main {
         // Print propagation information about all blocks
         printAllPropagation();
 
-        //TODO logger
+        // TODO logger
         System.out.println();
 
         Set<Block> blocks = new HashSet<>();
@@ -140,7 +137,8 @@ public class Main {
         // Get the latest block from the first simulated node
         Block block = getSimulatedNodes().get(0).getBlock();
 
-        //Update the list of known blocks by adding the parents of the aforementioned block
+        // Update the list of known blocks by adding the parents of the aforementioned
+        // block
         while (block.getParent() != null) {
             blocks.add(block);
             block = block.getParent();
@@ -160,7 +158,7 @@ public class Main {
 
         ArrayList<Block> blockList = new ArrayList<>(blocks);
 
-        //Sort the blocks first by time, then by hash code
+        // Sort the blocks first by time, then by hash code
         blockList.sort((a, b) -> {
             int order = Long.signum(a.getTime() - b.getTime());
             if (order != 0) {
@@ -170,7 +168,7 @@ public class Main {
             return order;
         });
 
-        //Log all orphans
+        // Log all orphans
         // TODO move to method and use logger
         for (Block orphan : orphans) {
             System.out.println(orphan + ":" + orphan.getHeight());
@@ -178,27 +176,24 @@ public class Main {
         System.out.println(averageOrphansSize);
 
         /*
-           Log in format:
-           ＜fork_information, block height, block ID＞
-fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Main chain.
-"Orphan" denote block is an orphan block.
-*/
+         * Log in format:
+         * ＜fork_information, block height, block ID＞
+         * fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on
+         * Main chain.
+         * "Orphan" denote block is an orphan block.
+         */
         // TODO move to method and use logger
-        try {
-            FileWriter fw = new FileWriter(new File(OUT_FILE_URI.resolve("./blockList.txt")), false);
-            PrintWriter pw = new PrintWriter(new BufferedWriter(fw));
-
+        try (var blocklistLogger = BasicLogger.getLogger("simblock.blocklist")) {
+            blocklistLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./blockList.txt")));
             for (Block b : blockList) {
                 if (!orphans.contains(b)) {
-                    pw.println("OnChain : " + b.getHeight() + " : " + b);
+                    blocklistLogger.println("OnChain : " + b.getHeight() + " : " + b);
                 } else {
-                    pw.println("Orphan : " + b.getHeight() + " : " + b);
+                    blocklistLogger.println("Orphan : " + b.getHeight() + " : " + b);
                 }
             }
-            pw.close();
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         logger.log("{");
@@ -207,7 +202,7 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
         logger.log("\"timestamp\":" + getCurrentTime());
         logger.log("}");
         logger.log("}");
-        //end json format
+        // end json format
         logger.log("]");
         logger.close();
 
@@ -243,14 +238,14 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
         }
     }
 
-
-    //TODO　以下の初期生成はシナリオを読み込むようにする予定
-    //ノードを参加させるタスクを作る(ノードの参加と，リンクの貼り始めるタスクは分ける)
-    //シナリオファイルで上の参加タスクをTimer入れていく．
+    // TODO 以下の初期生成はシナリオを読み込むようにする予定
+    // ノードを参加させるタスクを作る(ノードの参加と，リンクの貼り始めるタスクは分ける)
+    // シナリオファイルで上の参加タスクをTimer入れていく．
 
     // TRANSLATED FROM ABOVE STATEMENT
     // The following initial generation will load the scenario
-    // Create a task to join the node (separate the task of joining the node and the task of
+    // Create a task to join the node (separate the task of joining the node and the
+    // task of
     // starting to paste the link)
     // Add the above participating tasks with a timer in the scenario file.
 
@@ -261,7 +256,7 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
      * @param facum        whether the distribution is cumulative distribution
      * @return array list
      */
-    //TODO explanation on facum etc.
+    // TODO explanation on facum etc.
     public static ArrayList<Integer> makeRandomListFollowDistribution(double[] distribution, boolean facum) {
         ArrayList<Integer> list = new ArrayList<>();
         int index = 0;
@@ -298,20 +293,20 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
      * @param rate the rate of true
      * @return array list
      */
-    public static ArrayList<Boolean> makeRandomList(float rate){
+    public static ArrayList<Boolean> makeRandomList(float rate) {
         ArrayList<Boolean> list = new ArrayList<Boolean>();
-        for(int i=0; i < NUM_OF_NODES; i++){
-            list.add(i < NUM_OF_NODES*rate);
+        for (int i = 0; i < NUM_OF_NODES; i++) {
+            list.add(i < NUM_OF_NODES * rate);
         }
         Collections.shuffle(list, random);
         return list;
     }
 
     /**
-     * Generates a random mining power expressed as Hash Rate, and is the number of mining (hash
-     * calculation) executed per millisecond.
+     * Generates a random mining power expressed as Hash Rate, and is the number of
+     * mining (hash calculation) executed per millisecond.
      *
-     * @return the number of hash  calculations executed per millisecond.
+     * @return the number of hash calculations executed per millisecond.
      */
     public static int genMiningPower() {
         double r = random.nextGaussian();
@@ -345,8 +340,7 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
             // consensus algorithm
             Node node = new Node(
                     id, degreeList.get(id - 1) + 1, regionList.get(id - 1), genMiningPower(), TABLE,
-                    ALGO, useCBRNodes.get(id - 1), churnNodes.get(id - 1)
-                    );
+                    ALGO, useCBRNodes.get(id - 1), churnNodes.get(id - 1));
             // Add the node to the list of simulated nodes
             addNode(node);
 
@@ -365,20 +359,23 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
             node.joinNetwork();
         }
 
-        // Designates a random node (nodes in list are randomized) to mint the genesis block
+        // Designates a random node (nodes in list are randomized) to mint the genesis
+        // block
         getSimulatedNodes().get(0).genesisBlock();
     }
 
     /**
      * Network information when block height is <em>blockHeight</em>, in format:
      *
-     * <p><em>nodeID_1</em>, <em>nodeID_2</em>
+     * <p>
+     * <em>nodeID_1</em>, <em>nodeID_2</em>
      *
-     * <p>meaning there is a connection from nodeID_1 to right nodeID_1.
+     * <p>
+     * meaning there is a connection from nodeID_1 to right nodeID_1.
      *
      * @param blockHeight the index of the graph and the current block height
      */
-    //TODO use logger
+    // TODO use logger
     public static void writeGraph(int blockHeight) {
         try {
             FileWriter fw = new FileWriter(

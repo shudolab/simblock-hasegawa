@@ -43,6 +43,10 @@ public class BasicLogger implements Closeable {
         this.writer.flush();
     }
 
+    public void println(String message) {
+        this.writer.println(message);
+    }
+
     public void close() {
         this.writer.close();
     }
