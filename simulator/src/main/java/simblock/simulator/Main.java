@@ -86,28 +86,12 @@ public class Main {
         }
     }
 
-    /**
-     * The output writer.
-     */
-    //TODO use logger
-    public static PrintWriter OUT_JSON_FILE;
-
-    static {
-        try {
-            OUT_JSON_FILE = new PrintWriter(
-                    new BufferedWriter(new FileWriter(new File(OUT_FILE_URI.resolve("./output.json")))));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     static BasicLogger logger = BasicLogger.getLogger("simblock.output");
 
     /* Setup global logger */
     private static void setupLogger() {
         try {
-            logger.setFileWriter(new File(OUT_FILE_URI.resolve("./output.json")));
+            logger.setFileWriter(new File(OUT_FILE_URI.resolve("./logger_output.json")));
         }
         catch(IOException e) {
             e.printStackTrace();
@@ -126,8 +110,7 @@ public class Main {
         setTargetInterval(INTERVAL);
 
         //start json format
-        OUT_JSON_FILE.print("[");
-        OUT_JSON_FILE.flush();
+        logger.log("[");
 
         // Log regions
         var staticLogger = BasicLogger.getLogger("simblock.static");
@@ -218,22 +201,20 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
             ex.printStackTrace();
         }
 
-        OUT_JSON_FILE.print("{");
-        OUT_JSON_FILE.print("\"kind\":\"simulation-end\",");
-        OUT_JSON_FILE.print("\"content\":{");
-        OUT_JSON_FILE.print("\"timestamp\":" + getCurrentTime());
-        OUT_JSON_FILE.print("}");
-        OUT_JSON_FILE.print("}");
+        logger.log("{");
+        logger.log("\"kind\":\"simulation-end\",");
+        logger.log("\"content\":{");
+        logger.log("\"timestamp\":" + getCurrentTime());
+        logger.log("}");
+        logger.log("}");
         //end json format
-        OUT_JSON_FILE.print("]");
-        OUT_JSON_FILE.close();
-
+        logger.log("]");
+        logger.close();
 
         long end = System.currentTimeMillis();
         simulationTime += end - start;
         // Log simulation time in milliseconds
         System.out.println(simulationTime);
-
     }
 
     /* Main loop of the simulation */
@@ -369,15 +350,14 @@ fork_information: One of "OnChain" and "Orphan". "OnChain" denote block is on Ma
             // Add the node to the list of simulated nodes
             addNode(node);
 
-            OUT_JSON_FILE.print("{");
-            OUT_JSON_FILE.print("\"kind\":\"add-node\",");
-            OUT_JSON_FILE.print("\"content\":{");
-            OUT_JSON_FILE.print("\"timestamp\":0,");
-            OUT_JSON_FILE.print("\"node-id\":" + id + ",");
-            OUT_JSON_FILE.print("\"region-id\":" + regionList.get(id - 1));
-            OUT_JSON_FILE.print("}");
-            OUT_JSON_FILE.print("},");
-            OUT_JSON_FILE.flush();
+            logger.log("{");
+            logger.log("\"kind\":\"add-node\",");
+            logger.log("\"content\":{");
+            logger.log("\"timestamp\":0,");
+            logger.log("\"node-id\":" + id + ",");
+            logger.log("\"region-id\":" + regionList.get(id - 1));
+            logger.log("}");
+            logger.log("},");
 
         }
 
