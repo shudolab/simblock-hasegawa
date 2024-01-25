@@ -16,7 +16,7 @@
 
 package simblock.simulator;
 
-import static simblock.settings.SimulationConfiguration.NUM_OF_NODES;
+import static simblock.settings.SimulatorConfigulation.getNumOfNodes;
 import static simblock.simulator.Timer.getCurrentTime;
 
 import java.util.ArrayList;
@@ -189,7 +189,7 @@ public class Simulator {
         // System.out.println();
 
         // ノードIDごとに列が揃うように
-        long[] nodePropagationTimes = new long[NUM_OF_NODES];
+        long[] nodePropagationTimes = new long[getNumOfNodes()];
         for (Map.Entry<Integer, Long> timeEntry : propagation.entrySet()) {
             nodePropagationTimes[timeEntry.getKey() - 1] = timeEntry.getValue();
         }

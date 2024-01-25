@@ -16,14 +16,15 @@
 
 package simblock.simulator;
 
+import static simblock.settings.SimulatorConfigulation.readProperties;
+import static simblock.settings.SimulatorConfigulation.getAverageMiningPower;
+import static simblock.settings.SimulatorConfigulation.getCBRUsageRate;
+import static simblock.settings.SimulatorConfigulation.getEndBlockHeight;
+import static simblock.settings.SimulatorConfigulation.getInterval;
+import static simblock.settings.SimulatorConfigulation.getNumOfNodes;
+import static simblock.settings.SimulatorConfigulation.getStdevOfMiningPower;
 import static simblock.settings.SimulationConfiguration.ALGO;
-import static simblock.settings.SimulationConfiguration.AVERAGE_MINING_POWER;
-import static simblock.settings.SimulationConfiguration.END_BLOCK_HEIGHT;
-import static simblock.settings.SimulationConfiguration.INTERVAL;
-import static simblock.settings.SimulationConfiguration.NUM_OF_NODES;
-import static simblock.settings.SimulationConfiguration.STDEV_OF_MINING_POWER;
 import static simblock.settings.SimulationConfiguration.TABLE;
-import static simblock.settings.SimulationConfiguration.CBR_USAGE_RATE;
 import static simblock.settings.SimulationConfiguration.CHURN_NODE_RATE;
 import static simblock.simulator.Network.getDegreeDistribution;
 import static simblock.simulator.Network.getRegionDistribution;
@@ -76,10 +77,13 @@ public class Main {
      */
     public static URI OUT_FILE_URI;
 
+    public static URI PROPERTIES_FILE_URI;
+
     static {
         try {
             CONF_FILE_URI = ClassLoader.getSystemResource("simulator.conf").toURI();
             OUT_FILE_URI = CONF_FILE_URI.resolve(new URI("../output/"));
+            PROPERTIES_FILE_URI = CONF_FILE_URI.resolve(new URI("../../main/java/simblock/settings/properties/"));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -109,6 +113,15 @@ public class Main {
                         propagationFileName = args[i + 1];
                         i++;
                     }
+                    break;
+                case "-properties":
+                    if (i + 1 < args.length) {
+                        String propertiesFilePath = (PROPERTIES_FILE_URI + args[i + 1] + ".properties").toString()
+                                .replace("file:", "");
+                        readProperties(propertiesFilePath);
+                        i++;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -136,7 +149,7 @@ public class Main {
         setupLogger();
 
         final long start = System.currentTimeMillis();
-        setTargetInterval(INTERVAL);
+        setTargetInterval(getInterval());
 
         // start json format
         logger.log("[");
@@ -152,7 +165,7 @@ public class Main {
         }
 
         // Setup network
-        constructNetworkWithAllNodes(NUM_OF_NODES);
+        constructNetworkWithAllNodes(getNumOfNodes());
 
         // Simulate network
         simulationMain();
@@ -255,7 +268,7 @@ public class Main {
                 if (task.getParent().getHeight() == currentBlockHeight) {
                     currentBlockHeight++;
                 }
-                if (currentBlockHeight > END_BLOCK_HEIGHT) {
+                if (currentBlockHeight > getEndBlockHeight()) {
                     break;
                 }
                 // Log every 100 blocks and at the second block
@@ -294,22 +307,22 @@ public class Main {
 
         if (facum) {
             for (; index < distribution.length; index++) {
-                while (list.size() <= NUM_OF_NODES * distribution[index]) {
+                while (list.size() <= getNumOfNodes() * distribution[index]) {
                     list.add(index);
                 }
             }
-            while (list.size() < NUM_OF_NODES) {
+            while (list.size() < getNumOfNodes()) {
                 list.add(index);
             }
         } else {
             double acumulative = 0.0;
             for (; index < distribution.length; index++) {
                 acumulative += distribution[index];
-                while (list.size() <= NUM_OF_NODES * acumulative) {
+                while (list.size() <= getNumOfNodes() * acumulative) {
                     list.add(index);
                 }
             }
-            while (list.size() < NUM_OF_NODES) {
+            while (list.size() < getNumOfNodes()) {
                 list.add(index);
             }
         }
@@ -326,8 +339,8 @@ public class Main {
      */
     public static ArrayList<Boolean> makeRandomList(float rate) {
         ArrayList<Boolean> list = new ArrayList<Boolean>();
-        for (int i = 0; i < NUM_OF_NODES; i++) {
-            list.add(i < NUM_OF_NODES * rate);
+        for (int i = 0; i < getNumOfNodes(); i++) {
+            list.add(i < getNumOfNodes() * rate);
         }
         Collections.shuffle(list, random);
         return list;
@@ -342,7 +355,7 @@ public class Main {
     public static int genMiningPower() {
         double r = random.nextGaussian();
 
-        return Math.max((int) (r * STDEV_OF_MINING_POWER + AVERAGE_MINING_POWER), 1);
+        return Math.max((int) (r * getStdevOfMiningPower() + getAverageMiningPower()), 1);
     }
 
     /**
@@ -361,7 +374,7 @@ public class Main {
         List<Integer> degreeList = makeRandomListFollowDistribution(degreeDistribution, true);
 
         // List of nodes using compact block relay.
-        List<Boolean> useCBRNodes = makeRandomList(CBR_USAGE_RATE);
+        List<Boolean> useCBRNodes = makeRandomList(getCBRUsageRate());
 
         // List of churn nodes.
         List<Boolean> churnNodes = makeRandomList(CHURN_NODE_RATE);

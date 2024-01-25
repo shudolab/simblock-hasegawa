@@ -5,10 +5,11 @@
 # gradleでbuild
 ./gradlew build --quiet
 
-OUTPUT_FILE_NAME="output"
-PROPAGATION_FILE_NAME="test"
+PROPERTIES_FILE_NAME="base"
+OUTPUT_FILE_NAME=$PROPERTIES_FILE_NAME
+PROPAGATION_FILE_NAME=$PROPERTIES_FILE_NAME
 
-OPTION="-output $OUTPUT_FILE_NAME -propagation $PROPAGATION_FILE_NAME"
+OPTION="-output $OUTPUT_FILE_NAME -propagation $PROPAGATION_FILE_NAME -properties $PROPERTIES_FILE_NAME"
 
 # gradleを使わずに実行
 O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main  $OPTION
