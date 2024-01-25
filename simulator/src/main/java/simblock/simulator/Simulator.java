@@ -16,18 +16,22 @@
 
 package simblock.simulator;
 
+import static simblock.settings.SimulationConfiguration.NUM_OF_NODES;
+import static simblock.simulator.Main.propagationLogger;
 import static simblock.simulator.Timer.getCurrentTime;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import simblock.block.Block;
+import simblock.logger.BasicLogger;
 import simblock.node.Node;
 
-
 /**
- * The type Simulator is tasked with maintaining the list of simulated nodes and managing the
- * block interval. It observes and manages the arrival of new blocks at the simulation level.
+ * The type Simulator is tasked with maintaining the list of simulated nodes and
+ * managing the
+ * block interval. It observes and manages the arrival of new blocks at the
+ * simulation level.
  */
 public class Simulator {
 
@@ -88,7 +92,8 @@ public class Simulator {
     }
 
     /**
-     * Add node to the list of simulated nodes and immediately try to add the new node as a
+     * Add node to the list of simulated nodes and immediately try to add the new
+     * node as a
      * neighbor to all simulated
      * nodes.
      *
@@ -108,18 +113,21 @@ public class Simulator {
      */
     private static final ArrayList<Block> observedBlocks = new ArrayList<>();
 
+    static BasicLogger prpopagationLogger = BasicLogger.getLogger("simblock.propagation");
     /**
-     * A list of observed block propagation times. The map key represents the id of the node that
+     * A list of observed block propagation times. The map key represents the id of
+     * the node that
      * has seen the
-     * block, the value represents the difference between the current time and the block minting
+     * block, the value represents the difference between the current time and the
+     * block minting
      * time, effectively
      * recording the absolute time it took for a node to witness the block.
      */
-    private static final ArrayList<LinkedHashMap<Integer, Long>> observedPropagations =
-        new ArrayList<>();
+    private static final ArrayList<LinkedHashMap<Integer, Long>> observedPropagations = new ArrayList<>();
 
     /**
-     * Handle the arrival of a new block. For every observed block, propagation information is
+     * Handle the arrival of a new block. For every observed block, propagation
+     * information is
      * updated, and for a new
      * block propagation information is created.
      *
@@ -131,15 +139,15 @@ public class Simulator {
         if (observedBlocks.contains(block)) {
             // Get the propagation information for the current block
             LinkedHashMap<Integer, Long> propagation = observedPropagations.get(
-                    observedBlocks.indexOf(block)
-                    );
+                    observedBlocks.indexOf(block));
             // Update information for the new block
             propagation.put(node.getNodeID(), getCurrentTime() - block.getTime());
         } else {
             // If the block has not been seen by any node and there is no memory allocated
-            //TODO move magic number to constant
+            // TODO move magic number to constant
             if (observedBlocks.size() > 10) {
-                // After the observed blocks limit is reached, log and remove old blocks by FIFO principle
+                // After the observed blocks limit is reached, log and remove old blocks by FIFO
+                // principle
                 printPropagation(observedBlocks.get(0), observedPropagations.get(0));
                 observedBlocks.remove(0);
                 observedPropagations.remove(0);
@@ -155,26 +163,47 @@ public class Simulator {
     }
 
     /**
-     * Print propagation information about the propagation of the provided block  in the format:
+     * Print propagation information about the propagation of the provided block in
+     * the format:
      *
-     * <p><em>node_ID, propagation_time</em>
+     * <p>
+     * <em>node_ID, propagation_time</em>
      *
-     * <p><em>propagation_time</em>: The time from when the block of the block ID is generated to
+     * <p>
+     * <em>propagation_time</em>: The time from when the block of the block ID is
+     * generated to
      * when the
      * node of the <em>node_ID</em> is reached.
      *
      * @param block       the block
-     * @param propagation the propagation of the provided block as a list of {@link Node} IDs and
+     * @param propagation the propagation of the provided block as a list of
+     *                    {@link Node} IDs and
      *                    propagation times
      */
     public static void printPropagation(Block block, LinkedHashMap<Integer, Long> propagation) {
         // Print block and its height
-        //TODO block does not have a toString method, what is printed here
-        System.out.println(block + ":" + block.getHeight());
+        // TODO block does not have a toString method, what is printed here
+        // System.out.println(block + ":" + block.getHeight());
+        // for (Map.Entry<Integer, Long> timeEntry : propagation.entrySet()) {
+        // System.out.println(timeEntry.getKey() + "," + timeEntry.getValue());
+        // }
+        // System.out.println();
+
+        // ノードIDごとに列が揃うように
+        long[] nodePropagationTimes = new long[NUM_OF_NODES];
         for (Map.Entry<Integer, Long> timeEntry : propagation.entrySet()) {
-            System.out.println(timeEntry.getKey() + "," + timeEntry.getValue());
+            nodePropagationTimes[timeEntry.getKey() - 1] = timeEntry.getValue();
         }
-        System.out.println();
+
+        // csvファイルにプリントする
+        for (int i = 0; i < nodePropagationTimes.length; i++) {
+            if (i < nodePropagationTimes.length - 1) {
+                prpopagationLogger.print(Long.toString(nodePropagationTimes[i]) + ",");
+            } else {
+                prpopagationLogger.println(Long.toString(nodePropagationTimes[i]));
+            }
+        }
+
     }
 
     /**

@@ -86,11 +86,13 @@ public class Main {
     }
 
     static BasicLogger logger = BasicLogger.getLogger("simblock.output");
+    static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
 
     /* Setup global logger */
     private static void setupLogger() {
         try {
             logger.setFileWriter(new File(OUT_FILE_URI.resolve("./output.json")));
+            propagationLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./propagation.csv")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -111,7 +113,7 @@ public class Main {
         logger.log("[");
 
         // Log regions
-        var staticLogger = BasicLogger.getLogger("simblock.static");
+        BasicLogger staticLogger = BasicLogger.getLogger("simblock.static");
         try {
             staticLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./static.json")));
             printRegion();
@@ -183,7 +185,7 @@ public class Main {
          * "Orphan" denote block is an orphan block.
          */
         // TODO move to method and use logger
-        try (var blocklistLogger = BasicLogger.getLogger("simblock.blocklist")) {
+        try (BasicLogger blocklistLogger = BasicLogger.getLogger("simblock.blocklist")) {
             blocklistLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./blockList.txt")));
             for (Block b : blockList) {
                 if (!orphans.contains(b)) {
