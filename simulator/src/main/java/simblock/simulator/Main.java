@@ -85,19 +85,42 @@ public class Main {
         }
     }
 
+    private static String outputFileName = "output";
+    private static String propagationFileName = "propagation";
+
     static BasicLogger logger = BasicLogger.getLogger("simblock.output");
     static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
 
-    /* Setup global logger */
-    private static void setupLogger(String[] args) {
-        try {
-            logger.setFileWriter(new File(OUT_FILE_URI.resolve("./output.json")));
-            String propagationOutputFileName = "propagation";
-            if (args.length > 0) {
-                propagationOutputFileName = args[0];
+    /* Parse command line option */
+    private static void parseOption(String[] args) {
+        if (args.length == 0) {
+            return;
+        }
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "-output":
+                    if (i + 1 < args.length) {
+                        outputFileName = args[i + 1];
+                        i++;
+                    }
+                    break;
+                case "-propagation":
+                    if (i + 1 < args.length) {
+                        propagationFileName = args[i + 1];
+                        i++;
+                    }
+                default:
+                    break;
             }
-            propagationLogger.setFileWriter(
-                    new File(OUT_FILE_URI.resolve("./propagation/" + propagationOutputFileName + ".csv")));
+        }
+    }
+
+    /* Setup global logger */
+    private static void setupLogger() {
+        try {
+            logger.setFileWriter(new File(OUT_FILE_URI.resolve("./visualize/" + outputFileName + ".json")));
+            propagationLogger
+                    .setFileWriter(new File(OUT_FILE_URI.resolve("./propagation/" + propagationFileName + ".csv")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -109,7 +132,8 @@ public class Main {
      * @param args the input arguments
      */
     public static void main(String[] args) {
-        setupLogger(args);
+        parseOption(args);
+        setupLogger();
 
         final long start = System.currentTimeMillis();
         setTargetInterval(INTERVAL);
