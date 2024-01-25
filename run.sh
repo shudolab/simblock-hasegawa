@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# 並列実行時gradleで実行するとエラーが出たのでgradleでbuild -> 実行ファイルを直接実行の順番でやる
+
 # gradleでbuild
 ./gradlew build --quiet
 
