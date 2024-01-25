@@ -17,7 +17,6 @@
 package simblock.simulator;
 
 import static simblock.settings.SimulationConfiguration.NUM_OF_NODES;
-import static simblock.simulator.Main.propagationLogger;
 import static simblock.simulator.Timer.getCurrentTime;
 
 import java.util.ArrayList;
