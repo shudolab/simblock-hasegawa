@@ -89,10 +89,15 @@ public class Main {
     static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
 
     /* Setup global logger */
-    private static void setupLogger() {
+    private static void setupLogger(String[] args) {
         try {
             logger.setFileWriter(new File(OUT_FILE_URI.resolve("./output.json")));
-            propagationLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./propagation.csv")));
+            String propagationOutputFileName = "propagation";
+            if (args.length > 0) {
+                propagationOutputFileName = args[0];
+            }
+            propagationLogger.setFileWriter(
+                    new File(OUT_FILE_URI.resolve("./propagation/" + propagationOutputFileName + ".csv")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,7 +109,7 @@ public class Main {
      * @param args the input arguments
      */
     public static void main(String[] args) {
-        setupLogger();
+        setupLogger(args);
 
         final long start = System.currentTimeMillis();
         setTargetInterval(INTERVAL);
