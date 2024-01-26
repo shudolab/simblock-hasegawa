@@ -406,6 +406,11 @@ public class Main {
             node.joinNetwork();
         }
 
+        // for gossip penalty simulation
+        for (Node node : getSimulatedNodes()) {
+            node.initiateGossipPenaltyMap();
+        }
+
         // Designates a random node (nodes in list are randomized) to mint the genesis
         // block
         getSimulatedNodes().get(0).genesisBlock();

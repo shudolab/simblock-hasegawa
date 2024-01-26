@@ -72,4 +72,8 @@ public class SimulatorConfigulation {
     public static double getGossipProbability() {
         return Double.parseDouble(properties.getProperty("GOSSIP_PROBABILITY"));
     }
+
+    public static double getGossipPenaltyRate() {
+        return Double.parseDouble(properties.getProperty("GOSSIP_PENALTY_RATE"));
+    }
 }

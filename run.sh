@@ -5,11 +5,11 @@
 # gradleでbuild
 ./gradlew build --quiet
 
-PROPERTIES_FILE_NAME="gossip"
+PROPERTIES_FILE_NAME="gossip_pro0.5pena0.9"
 OUTPUT_FILE_NAME=$PROPERTIES_FILE_NAME
 PROPAGATION_FILE_NAME=$PROPERTIES_FILE_NAME
 
 OPTION="-output $OUTPUT_FILE_NAME -propagation $PROPAGATION_FILE_NAME -properties $PROPERTIES_FILE_NAME"
 
 # gradleを使わずに実行
-O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main  $OPTION
+M=16 J=$PROPAGATION_FILE_NAME O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main  $OPTION

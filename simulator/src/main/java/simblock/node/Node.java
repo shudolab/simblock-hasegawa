@@ -16,6 +16,7 @@
 
 package simblock.node;
 
+import static simblock.settings.SimulatorConfigulation.getGossipPenaltyRate;
 import static simblock.settings.SimulatorConfigulation.getGossipProbability;
 import static simblock.settings.SimulationConfiguration.BLOCK_SIZE;
 import static simblock.settings.SimulationConfiguration.CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CHURN_NODE;
@@ -30,7 +31,9 @@ import static simblock.simulator.Timer.putTask;
 import static simblock.simulator.Timer.removeTask;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -121,6 +124,8 @@ public class Node {
      * Global logger
      */
     private static BasicLogger logger = BasicLogger.getLogger("simblock.output");
+
+    private final HashMap<Node, Double> gossipPenaltyMap = new HashMap<>();
 
     /**
      * Instantiates a new Node.
@@ -275,6 +280,26 @@ public class Node {
         this.routingTable.initTable();
     }
 
+    public void initiateGossipPenaltyMap() {
+        for (Node node : this.getNeighbors()) {
+            this.gossipPenaltyMap.put(node, 1.0);
+        }
+    }
+
+    private void updateGossipPenaltyMap(Node sender) {
+        double currentSenderPenalty = this.gossipPenaltyMap.get(sender);
+        double nextSenderPenalty = currentSenderPenalty * getGossipPenaltyRate();
+        this.gossipPenaltyMap.put(sender, nextSenderPenalty);
+        double penaltyDiff = currentSenderPenalty - nextSenderPenalty;
+        for (Node node : this.getNeighbors()) {
+            if (node != sender) {
+                double currentPenalty = this.gossipPenaltyMap.get(node);
+                double nextPenalty = currentPenalty + penaltyDiff / (this.getNeighbors().size() - 1);
+                this.gossipPenaltyMap.put(node, nextPenalty);
+            }
+        }
+    }
+
     /**
      * Mint the genesis block.
      */
@@ -358,11 +383,10 @@ public class Node {
      */
     public void sendInv(Block block) {
         for (Node to : this.routingTable.getNeighbors()) {
-            if (random.nextDouble() < getGossipProbability()) {
+            if (random.nextDouble() < (getGossipProbability() * this.gossipPenaltyMap.get(to))) {
                 AbstractMessageTask task = new InvMessageTask(this, to, block);
                 putTask(task);
             }
-
         }
     }
 
@@ -439,6 +463,7 @@ public class Node {
             boolean success = random.nextDouble() > CBRfailureRate ? true : false;
             if (success) {
                 downloadingBlocks.remove(block);
+                updateGossipPenaltyMap(from);
                 this.receiveBlock(block);
             } else {
                 AbstractMessageTask task = new GetBlockTxnMessageTask(this, from, block);
@@ -449,6 +474,7 @@ public class Node {
         if (message instanceof BlockMessageTask) {
             Block block = ((BlockMessageTask) message).getBlock();
             downloadingBlocks.remove(block);
+            updateGossipPenaltyMap(from);
             this.receiveBlock(block);
         }
     }
