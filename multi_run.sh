@@ -5,7 +5,7 @@
 # gradleでbuild
 ./gradlew build --quiet
 
-PROPERTIES_FILE_NAMES=("base" "gossip")
+PROPERTIES_FILE_NAMES=("gossip0.1" "gossip0.2" "gossip0.3" "gossip0.4" "gossip0.5" "gossip0.6" "gossip0.7" "gossip0.8" "gossip0.9")
 
 for properties in "${PROPERTIES_FILE_NAMES[@]}"; do
     OUTPUT_FILE_NAME=${properties}
@@ -15,5 +15,5 @@ for properties in "${PROPERTIES_FILE_NAMES[@]}"; do
     OPTION="-output $OUTPUT_FILE_NAME -propagation $PROPAGATION_FILE_NAME -properties $PROPERTIES_FILE_NAME"
 
     # gradleを使わずに実行
-    O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main $OPTION
+    M=16 W=24 O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main $OPTION
 done
