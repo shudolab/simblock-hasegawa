@@ -16,6 +16,7 @@
 
 package simblock.node;
 
+import static simblock.settings.SimulatorConfigulation.getGossipProbability;
 import static simblock.settings.SimulationConfiguration.BLOCK_SIZE;
 import static simblock.settings.SimulationConfiguration.CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CHURN_NODE;
 import static simblock.settings.SimulationConfiguration.CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CONTROL_NODE;
@@ -33,6 +34,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import static simblock.simulator.Main.random;
 import simblock.block.Block;
 import simblock.node.consensus.AbstractConsensusAlgo;
 import simblock.node.routing.AbstractRoutingTable;
@@ -105,7 +107,7 @@ public class Node {
     // TODO verify
     private boolean sendingBlock = false;
 
-    //TODO
+    // TODO
     private final ArrayList<AbstractMessageTask> messageQue = new ArrayList<>();
     // TODO
     private final Set<Block> downloadingBlocks = new HashSet<>();
@@ -134,8 +136,7 @@ public class Node {
      */
     public Node(
             int nodeID, int numConnection, int region, long miningPower, String routingTableName,
-            String consensusAlgoName, boolean useCBR, boolean isChurnNode
-            ) {
+            String consensusAlgoName, boolean useCBR, boolean isChurnNode) {
         this.nodeID = nodeID;
         this.region = region;
         this.miningPower = miningPower;
@@ -151,7 +152,7 @@ public class Node {
         } catch (Exception e) {
             e.printStackTrace();
         }
-            }
+    }
 
     /**
      * Gets the node id.
@@ -283,7 +284,8 @@ public class Node {
     }
 
     /**
-     * Adds a new block to the to chain. If node was minting that task instance is abandoned, and
+     * Adds a new block to the to chain. If node was minting that task instance is
+     * abandoned, and
      * the new block arrival is handled.
      *
      * @param newBlock the new block
@@ -323,7 +325,7 @@ public class Node {
      * @param orphanBlock the orphan block
      * @param validBlock  the valid block
      */
-    //TODO check this out later
+    // TODO check this out later
     public void addOrphans(Block orphanBlock, Block validBlock) {
         if (orphanBlock != validBlock) {
             this.orphans.add(orphanBlock);
@@ -356,8 +358,11 @@ public class Node {
      */
     public void sendInv(Block block) {
         for (Node to : this.routingTable.getNeighbors()) {
-            AbstractMessageTask task = new InvMessageTask(this, to, block);
-            putTask(task);
+            if (random.nextDouble() < getGossipProbability()) {
+                AbstractMessageTask task = new InvMessageTask(this, to, block);
+                putTask(task);
+            }
+
         }
     }
 
@@ -380,7 +385,8 @@ public class Node {
             this.sendInv(block);
         } else if (!this.orphans.contains(block) && !block.isOnSameChainAs(this.block)) {
             // TODO better understand - what if orphan is not valid?
-            // If the block was not valid but was an unknown orphan and is not on the same chain as the
+            // If the block was not valid but was an unknown orphan and is not on the same
+            // chain as the
             // current block
             this.addOrphans(block, this.block);
             arriveBlock(block, this);
@@ -418,19 +424,20 @@ public class Node {
             }
         }
 
-        if (message instanceof GetBlockTxnMessageTask){
+        if (message instanceof GetBlockTxnMessageTask) {
             this.messageQue.add((GetBlockTxnMessageTask) message);
-            if (!sendingBlock){
+            if (!sendingBlock) {
                 this.sendNextBlockMessage();
             }
         }
 
-        if (message instanceof CmpctBlockMessageTask){
+        if (message instanceof CmpctBlockMessageTask) {
             Block block = ((CmpctBlockMessageTask) message).getBlock();
             Random random = new Random();
-            float CBRfailureRate = this.isChurnNode ? CBR_FAILURE_RATE_FOR_CHURN_NODE : CBR_FAILURE_RATE_FOR_CONTROL_NODE;
+            float CBRfailureRate = this.isChurnNode ? CBR_FAILURE_RATE_FOR_CHURN_NODE
+                    : CBR_FAILURE_RATE_FOR_CONTROL_NODE;
             boolean success = random.nextDouble() > CBRfailureRate ? true : false;
-            if (success){
+            if (success) {
                 downloadingBlocks.remove(block);
                 this.receiveBlock(block);
             } else {
@@ -446,18 +453,17 @@ public class Node {
         }
     }
 
-
     /**
      * Gets block size when the node fails compact block relay.
      */
-    private long getFailedBlockSize(){
+    private long getFailedBlockSize() {
         Random random = new Random();
-        if (this.isChurnNode){
+        if (this.isChurnNode) {
             int index = random.nextInt(CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CHURN_NODE.length);
-            return (long)(BLOCK_SIZE * CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CHURN_NODE[index]);
+            return (long) (BLOCK_SIZE * CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CHURN_NODE[index]);
         } else {
             int index = random.nextInt(CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CONTROL_NODE.length);
-            return (long)(BLOCK_SIZE * CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CONTROL_NODE[index]);
+            return (long) (BLOCK_SIZE * CBR_FAILURE_BLOCK_SIZE_DISTRIBUTION_FOR_CONTROL_NODE[index]);
         }
     }
 
@@ -472,11 +478,12 @@ public class Node {
 
             AbstractMessageTask messageTask;
 
-            if (this.messageQue.get(0) instanceof RecMessageTask){
+            if (this.messageQue.get(0) instanceof RecMessageTask) {
                 Block block = ((RecMessageTask) this.messageQue.get(0)).getBlock();
                 // If use compact block relay.
                 if (this.messageQue.get(0).getFrom().useCBR && this.useCBR) {
-                    // Convert bytes to bits and divide by the bandwidth expressed as bit per millisecond, add
+                    // Convert bytes to bits and divide by the bandwidth expressed as bit per
+                    // millisecond, add
                     // processing time.
                     long delay = COMPACT_BLOCK_SIZE * 8 / (bandwidth / 1000) + processingTime;
 

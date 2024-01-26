@@ -68,4 +68,8 @@ public class SimulatorConfigulation {
     public static int getStdevOfMiningPower() {
         return Integer.parseInt(properties.getProperty("STDEV_OF_MINING_POWER"));
     }
+
+    public static double getGossipProbability() {
+        return Double.parseDouble(properties.getProperty("GOSSIP_PROBABILITY"));
+    }
 }

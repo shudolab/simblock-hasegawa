@@ -23,6 +23,12 @@ out.txt
 !/simulator/src/dist/output/graph/
 /simulator/src/dist/output/graph/*
 !/simulator/src/dist/output/graph/.gitkeep
+!/simulator/src/dist/output/visualize/
+/simulator/src/dist/output/visualize/*
+!/simulator/src/dist/output/visualize/.gitkeep
+!/simulator/src/dist/output/propagation/
+/simulator/src/dist/output/propagation/*
+!/simulator/src/dist/output/propagation/.gitkeep
 
 #for MacOS
 .DS_Store

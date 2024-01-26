@@ -91,6 +91,8 @@ public class Main {
 
     private static String outputFileName = "output";
     private static String propagationFileName = "propagation";
+    private static String propertiesFilePath = (PROPERTIES_FILE_URI + "gossip.properties").toString()
+            .replace("file:", "");
 
     static BasicLogger logger = BasicLogger.getLogger("simblock.output");
     static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
@@ -116,9 +118,8 @@ public class Main {
                     break;
                 case "-properties":
                     if (i + 1 < args.length) {
-                        String propertiesFilePath = (PROPERTIES_FILE_URI + args[i + 1] + ".properties").toString()
+                        propertiesFilePath = (PROPERTIES_FILE_URI + args[i + 1] + ".properties").toString()
                                 .replace("file:", "");
-                        readProperties(propertiesFilePath);
                         i++;
                     }
                     break;
@@ -147,6 +148,7 @@ public class Main {
     public static void main(String[] args) {
         parseOption(args);
         setupLogger();
+        readProperties(propertiesFilePath);
 
         final long start = System.currentTimeMillis();
         setTargetInterval(getInterval());
