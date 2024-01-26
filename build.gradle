@@ -79,6 +79,8 @@ project(':simulator') {
     def distSettings = {
         archiveBaseName = 'simblock'
         exclude('output/graph/*.*')
+        exclude('output/propagation/*.*')
+        exclude('output/visualize/*.*')
         exclude('output/*.*')
     }
 

@@ -15,5 +15,5 @@ for properties in "${PROPERTIES_FILE_NAMES[@]}"; do
     OPTION="-output $OUTPUT_FILE_NAME -propagation $PROPAGATION_FILE_NAME -properties $PROPERTIES_FILE_NAME"
 
     # gradleを使わずに実行
-    M=16 O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main $OPTION
+    M=16 J=$properties O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main $OPTION
 done
