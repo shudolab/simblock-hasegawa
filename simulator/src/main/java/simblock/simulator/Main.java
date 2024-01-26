@@ -276,7 +276,8 @@ public class Main {
                 // Log every 100 blocks and at the second block
                 // TODO use constants here
                 if (currentBlockHeight % 100 == 0 || currentBlockHeight == 2) {
-                    writeGraph(currentBlockHeight);
+                    // writeGraph(currentBlockHeight);
+                    System.out.println("height=" + currentBlockHeight);
                 }
             }
             // Execute task
