@@ -130,11 +130,14 @@ public class Main {
         try {
             logger.setFileWriter(new File(OUT_FILE_URI.resolve("./visualize/" + outputFileName + ".json")));
             propagationLogger
-                    .setFileWriter(new File(OUT_FILE_URI.resolve("./propagation/" + propagationFileName + ".csv")));
-            hashrateLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./hashrate/" + hashrateFileName + ".csv")));
+                    .setFileWriter(
+                            new File(OUT_FILE_URI.resolve("./analysis/propagation/" + propagationFileName + ".csv")));
+            hashrateLogger
+                    .setFileWriter(new File(OUT_FILE_URI.resolve("./analysis/hashrate/" + hashrateFileName + ".csv")));
             mainChainMinerLogger
                     .setFileWriter(
-                            new File(OUT_FILE_URI.resolve("./mainChainMiner/" + mainChainMinerFileName + ".csv")));
+                            new File(OUT_FILE_URI
+                                    .resolve("./analysis/mainChainMiner/" + mainChainMinerFileName + ".csv")));
         } catch (IOException e) {
             e.printStackTrace();
         }

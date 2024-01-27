@@ -79,10 +79,9 @@ project(':simulator') {
     def distSettings = {
         archiveBaseName = 'simblock'
         exclude('output/graph/*.*')
-        exclude('output/propagation/*.*')
-        exclude('output/visualize/*.*')
-        exclude('output/hashrate/*.*')
-        exclude('output/mainChainMiner/*.*')
+        exclude('output/analysis/hashrate/*.*')
+        exclude('output/analysis/mainChainMiner/*.*')
+        exclude('output/analysis/propagation/*.*')
         exclude('output/*.*')
     }
 
