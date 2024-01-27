@@ -8,11 +8,9 @@
 PROPERTIES_FILE_NAMES=("gossip0.1" "gossip0.2" "gossip0.3" "gossip0.4" "gossip0.5" "gossip0.6" "gossip0.7" "gossip0.8" "gossip0.9")
 
 for properties in "${PROPERTIES_FILE_NAMES[@]}"; do
-    OUTPUT_FILE_NAME=${properties}
-    PROPAGATION_FILE_NAME=${properties}
     PROPERTIES_FILE_NAME=${properties}
 
-    OPTION="-output $OUTPUT_FILE_NAME -propagation $PROPAGATION_FILE_NAME -properties $PROPERTIES_FILE_NAME"
+    OPTION="-properties $PROPERTIES_FILE_NAME"
 
     # gradleを使わずに実行
     M=16 J=$properties O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main $OPTION

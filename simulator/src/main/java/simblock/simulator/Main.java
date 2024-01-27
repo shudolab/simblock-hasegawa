@@ -104,20 +104,10 @@ public class Main {
         }
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-                case "-output":
-                    if (i + 1 < args.length) {
-                        outputFileName = args[i + 1];
-                        i++;
-                    }
-                    break;
-                case "-propagation":
-                    if (i + 1 < args.length) {
-                        propagationFileName = args[i + 1];
-                        i++;
-                    }
-                    break;
                 case "-properties":
                     if (i + 1 < args.length) {
+                        outputFileName = args[i + 1];
+                        propagationFileName = args[i + 1];
                         propertiesFilePath = (PROPERTIES_FILE_URI + args[i + 1] + ".properties").toString()
                                 .replace("file:", "");
                         i++;
@@ -385,8 +375,9 @@ public class Main {
         for (int id = 1; id <= numNodes; id++) {
             // Each node gets assigned a region, its degree, mining power, routing table and
             // consensus algorithm
+            int miningPower = genMiningPower();
             Node node = new Node(
-                    id, degreeList.get(id - 1) + 1, regionList.get(id - 1), genMiningPower(), TABLE,
+                    id, degreeList.get(id - 1) + 1, regionList.get(id - 1), miningPower, TABLE,
                     ALGO, useCBRNodes.get(id - 1), churnNodes.get(id - 1));
             // Add the node to the list of simulated nodes
             addNode(node);
