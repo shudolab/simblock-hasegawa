@@ -81,6 +81,8 @@ project(':simulator') {
         exclude('output/graph/*.*')
         exclude('output/propagation/*.*')
         exclude('output/visualize/*.*')
+        exclude('output/hashrate/*.*')
+        exclude('output/mainChainMiner/*.*')
         exclude('output/*.*')
     }
 

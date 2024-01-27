@@ -91,11 +91,15 @@ public class Main {
 
     private static String outputFileName = "output";
     private static String propagationFileName = "propagation";
+    private static String hashrateFileName = "hashrate";
+    private static String mainChainMinerFileName = "mainChainMiner";
     private static String propertiesFilePath = (PROPERTIES_FILE_URI + "gossip.properties").toString()
             .replace("file:", "");
 
     static BasicLogger logger = BasicLogger.getLogger("simblock.output");
     static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
+    static BasicLogger hashrateLogger = BasicLogger.getLogger("simblock.hashrate");
+    static BasicLogger mainChainMinerLogger = BasicLogger.getLogger("simblock.mainChainMiner");
 
     /* Parse command line option */
     private static void parseOption(String[] args) {
@@ -108,6 +112,8 @@ public class Main {
                     if (i + 1 < args.length) {
                         outputFileName = args[i + 1];
                         propagationFileName = args[i + 1];
+                        hashrateFileName = args[i + 1];
+                        mainChainMinerFileName = args[i + 1];
                         propertiesFilePath = (PROPERTIES_FILE_URI + args[i + 1] + ".properties").toString()
                                 .replace("file:", "");
                         i++;
@@ -125,6 +131,10 @@ public class Main {
             logger.setFileWriter(new File(OUT_FILE_URI.resolve("./visualize/" + outputFileName + ".json")));
             propagationLogger
                     .setFileWriter(new File(OUT_FILE_URI.resolve("./propagation/" + propagationFileName + ".csv")));
+            hashrateLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./hashrate/" + hashrateFileName + ".csv")));
+            mainChainMinerLogger
+                    .setFileWriter(
+                            new File(OUT_FILE_URI.resolve("./mainChainMiner/" + mainChainMinerFileName + ".csv")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -169,6 +179,7 @@ public class Main {
         System.out.println();
 
         Set<Block> blocks = new HashSet<>();
+        ArrayList<Block> mainChain = new ArrayList<>();
 
         // Get the latest block from the first simulated node
         Block block = getSimulatedNodes().get(0).getBlock();
@@ -177,7 +188,17 @@ public class Main {
         // block
         while (block.getParent() != null) {
             blocks.add(block);
+            mainChain.add(block);
             block = block.getParent();
+        }
+
+        // Log the main chain minter
+        for (int i = 0; i < mainChain.size(); i++) {
+            if (i < mainChain.size() - 1) {
+                mainChainMinerLogger.log((mainChain.get(i).getMinter().getNodeID() - 1) + ",");
+            } else {
+                mainChainMinerLogger.log((mainChain.get(i).getMinter().getNodeID() - 1) + "");
+            }
         }
 
         Set<Block> orphans = new HashSet<>();
@@ -381,6 +402,13 @@ public class Main {
                     ALGO, useCBRNodes.get(id - 1), churnNodes.get(id - 1));
             // Add the node to the list of simulated nodes
             addNode(node);
+
+            // Log the node hashrate
+            if (id < numNodes) {
+                hashrateLogger.log(miningPower + ",");
+            } else {
+                hashrateLogger.log(miningPower + "");
+            }
 
             logger.log("{");
             logger.log("\"kind\":\"add-node\",");

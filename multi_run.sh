@@ -5,7 +5,7 @@
 # gradleでbuild
 ./gradlew build --quiet
 
-PROPERTIES_FILE_NAMES=("gossip0.1" "gossip0.2" "gossip0.3" "gossip0.4" "gossip0.5" "gossip0.6" "gossip0.7" "gossip0.8" "gossip0.9")
+PROPERTIES_FILE_NAMES=("gossip0.1" "gossip0.2" "gossip0.3" "gossip0.4" "gossip0.5" "gossip0.6" "gossip0.7" "gossip0.8" "gossip0.9" "gossip_pro0.5_pena0.9")
 
 for properties in "${PROPERTIES_FILE_NAMES[@]}"; do
     PROPERTIES_FILE_NAME=${properties}

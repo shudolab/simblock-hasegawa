@@ -29,6 +29,12 @@ out.txt
 !/simulator/src/dist/output/propagation/
 /simulator/src/dist/output/propagation/*
 !/simulator/src/dist/output/propagation/.gitkeep
+!/simulator/src/dist/output/hashrate*
+/simulator/src/dist/output/hashrate/*
+!/simulator/src/dist/output/hashrate/.gitkeep
+!/simulator/src/dist/output/mainChainMiner*
+/simulator/src/dist/output/mainChainMiner/*
+!/simulator/src/dist/output/mainChainMiner/.gitkeep
 
 #for MacOS
 .DS_Store
