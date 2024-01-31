@@ -32,6 +32,7 @@ import static simblock.simulator.Network.printRegion;
 import static simblock.simulator.Simulator.addNode;
 import static simblock.simulator.Simulator.getSimulatedNodes;
 import static simblock.simulator.Simulator.printAllPropagation;
+import static simblock.simulator.Simulator.printResult;
 import static simblock.simulator.Simulator.setTargetInterval;
 import static simblock.simulator.Timer.getCurrentTime;
 import static simblock.simulator.Timer.getTask;
@@ -91,9 +92,13 @@ public class Main {
 
     private static String outputFileName = "output";
     private static String propagationFileName = "propagation";
+    private static String resultFileName = "result";
+    private static String propertiesFilePath = (PROPERTIES_FILE_URI + "base.properties").toString()
+            .replace("file:", "");
 
     static BasicLogger logger = BasicLogger.getLogger("simblock.output");
     static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
+    static BasicLogger resultLogger = BasicLogger.getLogger("simblock.result");
 
     /* Parse command line option */
     private static void parseOption(String[] args) {
@@ -102,23 +107,13 @@ public class Main {
         }
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-                case "-output":
-                    if (i + 1 < args.length) {
-                        outputFileName = args[i + 1];
-                        i++;
-                    }
-                    break;
-                case "-propagation":
-                    if (i + 1 < args.length) {
-                        propagationFileName = args[i + 1];
-                        i++;
-                    }
-                    break;
                 case "-properties":
                     if (i + 1 < args.length) {
-                        String propertiesFilePath = (PROPERTIES_FILE_URI + args[i + 1] + ".properties").toString()
+                        propertiesFilePath = (PROPERTIES_FILE_URI + args[i + 1] + ".properties").toString()
                                 .replace("file:", "");
-                        readProperties(propertiesFilePath);
+                        // outputFileName = args[i + 1];
+                        propagationFileName = args[i + 1];
+                        resultFileName = args[i + 1];
                         i++;
                     }
                     break;
@@ -134,7 +129,9 @@ public class Main {
             logger.setFileWriter(new File(OUT_FILE_URI.resolve("./visualize/" + outputFileName + ".json")));
             propagationLogger
                     .setFileWriter(
-                            new File(OUT_FILE_URI.resolve("./analysis/propagation/" + propagationFileName + ".csv")));
+                            new File(OUT_FILE_URI.resolve("./propagation/" + propagationFileName + ".csv")));
+
+            resultLogger.setFileWriter(new File(OUT_FILE_URI.resolve("./result/" + resultFileName + ".json")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -147,6 +144,7 @@ public class Main {
      */
     public static void main(String[] args) {
         parseOption(args);
+        readProperties(propertiesFilePath);
         setupLogger();
 
         final long start = System.currentTimeMillis();
@@ -173,6 +171,8 @@ public class Main {
 
         // Print propagation information about all blocks
         printAllPropagation();
+
+        printResult();
 
         // TODO logger
         System.out.println();
@@ -276,6 +276,7 @@ public class Main {
                 // TODO use constants here
                 if (currentBlockHeight % 100 == 0 || currentBlockHeight == 2) {
                     writeGraph(currentBlockHeight);
+                    System.out.println("height : " + currentBlockHeight);
                 }
             }
             // Execute task

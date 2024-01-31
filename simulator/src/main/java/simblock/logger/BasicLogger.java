@@ -3,7 +3,6 @@ package simblock.logger;
 import java.io.*;
 import java.util.HashMap;
 
-
 /**
  * Basic logger class
  */
@@ -13,9 +12,12 @@ public class BasicLogger implements Closeable {
     /** Store loggers */
     private static HashMap<String, BasicLogger> namedLoggers = new HashMap<>();
 
-    /** Cannot be instanced by the constructor directly. Use BasicLogger.getLogger. */
+    /**
+     * Cannot be instanced by the constructor directly. Use BasicLogger.getLogger.
+     */
     private BasicLogger() {
-        // this.writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+        // this.writer = new PrintWriter(new BufferedWriter(new
+        // OutputStreamWriter(System.out)));
     }
 
     /** Returns logger instance by name */
@@ -48,8 +50,7 @@ public class BasicLogger implements Closeable {
         if (this.writer != null) {
             this.writer.print(message);
             this.writer.flush();
-        }
-        else {
+        } else {
             System.out.print(message);
         }
     }
@@ -57,8 +58,7 @@ public class BasicLogger implements Closeable {
     public void println(String message) {
         if (this.writer != null) {
             this.writer.println(message);
-        }
-        else {
+        } else {
             System.out.println(message);
         }
     }

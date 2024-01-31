@@ -29,6 +29,10 @@ out.txt
 !/simulator/src/dist/output/propagation/
 /simulator/src/dist/output/propagation/*
 !/simulator/src/dist/output/propagation/.gitkeep
+!/simulator/src/dist/output/result/
+/simulator/src/dist/output/result/*
+!/simulator/src/dist/output/result/.gitkeep
+
 
 
 #for MacOS

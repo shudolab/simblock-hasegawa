@@ -16,6 +16,7 @@
 
 package simblock.simulator;
 
+import static simblock.settings.SimulatorConfigulation.getEndBlockHeight;
 import static simblock.settings.SimulatorConfigulation.getNumOfNodes;
 import static simblock.simulator.Timer.getCurrentTime;
 
@@ -43,6 +44,29 @@ public class Simulator {
      * The target block interval in milliseconds.
      */
     private static long targetInterval;
+
+    private static long blockSum = 0;
+
+    private static double average50PropagationTime = 0;
+
+    private static double average90PropagationTime = 0;
+
+    private static double average100PropagationTime = 0;
+
+    private static double averageMeanPropagationTime = 0;
+
+    private static double averageHashrateWeightedPropagationTime = 0;
+
+    private static final ArrayList<Long> hashrateList = new ArrayList<>();
+
+    private static long hashrateSum = 0;
+
+    /**
+     * row minter id, column nodes id
+     */
+    private static long[][] propagationTimeBetweenNodes = new long[getNumOfNodes()][getNumOfNodes()];
+
+    private static long[] minerCount = new long[getNumOfNodes()];
 
     /**
      * Get simulated nodes list.
@@ -78,6 +102,8 @@ public class Simulator {
      */
     public static void addNode(Node node) {
         simulatedNodes.add(node);
+        hashrateList.add(node.getMiningPower());
+        hashrateSum += node.getMiningPower();
     }
 
     /**
@@ -112,7 +138,9 @@ public class Simulator {
      */
     private static final ArrayList<Block> observedBlocks = new ArrayList<>();
 
-    static BasicLogger prpopagationLogger = BasicLogger.getLogger("simblock.propagation");
+    static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
+
+    static BasicLogger resultLogger = BasicLogger.getLogger("simblock.result");
     /**
      * A list of observed block propagation times. The map key represents the id of
      * the node that
@@ -188,18 +216,43 @@ public class Simulator {
         // }
         // System.out.println();
 
-        // ノードIDごとに列が揃うように
+        blockSum++;
+
+        // ノードIDごとに列が揃えたpropagation time
         long[] nodePropagationTimes = new long[getNumOfNodes()];
+
+        int minerIndex = block.getMinter().getNodeID() - 1;
+        minerCount[minerIndex]++;
+
+        int index = 1;
         for (Map.Entry<Integer, Long> timeEntry : propagation.entrySet()) {
-            nodePropagationTimes[timeEntry.getKey() - 1] = timeEntry.getValue();
+            int nodeIndex = timeEntry.getKey() - 1;
+            long propagationTime = timeEntry.getValue();
+
+            nodePropagationTimes[nodeIndex] = propagationTime;
+
+            propagationTimeBetweenNodes[minerIndex][nodeIndex] += (double) propagationTime;
+
+            if (index == (int) (getNumOfNodes() * 0.5)) {
+                average50PropagationTime += (double) propagationTime;
+            } else if (index == (int) (getNumOfNodes() * 0.9)) {
+                average90PropagationTime += (double) propagationTime;
+            } else if (index == getNumOfNodes()) {
+                average100PropagationTime += (double) propagationTime;
+            }
+            averageMeanPropagationTime += (double) propagationTime / getNumOfNodes();
+            averageHashrateWeightedPropagationTime += (double) propagationTime * hashrateList.get(nodeIndex)
+                    / hashrateSum;
+
+            index++;
         }
 
-        // csvファイルにプリントする
+        // ノードIDごとに列を揃えたpropagation timeをcsvファイルにプリントする
         for (int i = 0; i < nodePropagationTimes.length; i++) {
             if (i < nodePropagationTimes.length - 1) {
-                prpopagationLogger.print(Long.toString(nodePropagationTimes[i]) + ",");
+                propagationLogger.print(Long.toString(nodePropagationTimes[i]) + ",");
             } else {
-                prpopagationLogger.println(Long.toString(nodePropagationTimes[i]));
+                propagationLogger.println(Long.toString(nodePropagationTimes[i]));
             }
         }
 
@@ -213,5 +266,29 @@ public class Simulator {
         for (int i = 0; i < observedBlocks.size(); i++) {
             printPropagation(observedBlocks.get(i), observedPropagations.get(i));
         }
+    }
+
+    public static void printResult() {
+        average50PropagationTime /= blockSum;
+        average90PropagationTime /= blockSum;
+        average100PropagationTime /= blockSum;
+        averageMeanPropagationTime /= blockSum;
+        averageHashrateWeightedPropagationTime /= blockSum;
+
+        for (int i = 0; i < propagationTimeBetweenNodes.length; i++) {
+            for (int j = 0; j < propagationTimeBetweenNodes[i].length; j++) {
+                propagationTimeBetweenNodes[i][j] /= minerCount[i];
+            }
+        }
+
+        resultLogger.print("{\n");
+        resultLogger.print("\"average-50-propagation-time\" :" + average50PropagationTime + ",\n");
+        resultLogger.print("\"average-90-propagation-time\" :" + average90PropagationTime + ",\n");
+        resultLogger.print("\"average-100-propagation-time\" :" + average100PropagationTime + ",\n");
+        resultLogger.print("\"average-mean-propagation-time\" :" + averageMeanPropagationTime + ",\n");
+        resultLogger
+                .print("\"average-hashrate-weighted-propagation-time\" :" + averageHashrateWeightedPropagationTime);
+        resultLogger.print("\n}");
+
     }
 }

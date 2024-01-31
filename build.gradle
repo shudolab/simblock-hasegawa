@@ -80,6 +80,8 @@ project(':simulator') {
         archiveBaseName = 'simblock'
         exclude('output/graph/*.*')
         exclude('output/propagation/*.*')
+        exclude('output/result/*.*')
+        exclude('output/visualize/*.*')
         exclude('output/*.*')
     }
 
