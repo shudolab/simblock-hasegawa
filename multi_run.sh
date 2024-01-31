@@ -5,7 +5,7 @@
 # gradleでbuild
 ./gradlew build --quiet
 
-PROPERTIES_FILE_NAMES=("base" "n1000h10000")
+PROPERTIES_FILE_NAMES=("base" "light" "initial")
 
 for properties in "${PROPERTIES_FILE_NAMES[@]}"; do
     OUTPUT_FILE_NAME=${properties}
