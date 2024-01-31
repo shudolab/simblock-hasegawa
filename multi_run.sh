@@ -8,11 +8,8 @@
 PROPERTIES_FILE_NAMES=("base" "light" "initial")
 
 for properties in "${PROPERTIES_FILE_NAMES[@]}"; do
-    OUTPUT_FILE_NAME=${properties}
-    PROPAGATION_FILE_NAME=${properties}
-    PROPERTIES_FILE_NAME=${properties}
 
-    OPTION="-properties $PROPERTIES_FILE_NAME"
+    OPTION="-properties $properties"
 
     # gradleを使わずに実行
     O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main $OPTION
