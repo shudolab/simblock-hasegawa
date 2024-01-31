@@ -5,7 +5,7 @@
 # gradleでbuild
 ./gradlew build --quiet
 
-PROPERTIES_FILE_NAME="gossip_pro0.5pena0.9"
+PROPERTIES_FILE_NAME="base"
 
 OPTION="-properties $PROPERTIES_FILE_NAME"
 
