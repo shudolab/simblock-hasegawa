@@ -91,12 +91,8 @@ public class Main {
 
     private static String outputFileName = "output";
     private static String propagationFileName = "propagation";
-    private static String hashrateFileName = "hashrate";
-    private static String mainChainMinerFileName = "mainChainMiner";
 
     static BasicLogger logger = BasicLogger.getLogger("simblock.output");
-    static BasicLogger hashrateLogger = BasicLogger.getLogger("simblock.hashrate");
-    static BasicLogger mainChainMinerLogger = BasicLogger.getLogger("simblock.mainChainMiner");
     static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
 
     /* Parse command line option */
@@ -139,12 +135,6 @@ public class Main {
             propagationLogger
                     .setFileWriter(
                             new File(OUT_FILE_URI.resolve("./analysis/propagation/" + propagationFileName + ".csv")));
-            hashrateLogger
-                    .setFileWriter(new File(OUT_FILE_URI.resolve("./analysis/hashrate/" + hashrateFileName + ".csv")));
-            mainChainMinerLogger
-                    .setFileWriter(
-                            new File(OUT_FILE_URI
-                                    .resolve("./analysis/mainChainMiner/" + mainChainMinerFileName + ".csv")));
         } catch (IOException e) {
             e.printStackTrace();
         }

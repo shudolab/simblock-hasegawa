@@ -26,16 +26,9 @@ out.txt
 !/simulator/src/dist/output/visualize/
 /simulator/src/dist/output/visualize/*
 !/simulator/src/dist/output/visualize/.gitkeep
-!/simulator/src/dist/output/analysis/
-!/simulator/src/dist/output/analysis/hashrate/
-/simulator/src/dist/output/analysis/hashrate/*
-!/simulator/src/dist/output/analysis/hashrate/.gitkeep
-!/simulator/src/dist/output/analysis/mainChainMiner/
-/simulator/src/dist/output/analysis/mainChainMiner/*
-!/simulator/src/dist/output/analysis/mainChainMiner/.gitkeep
-!/simulator/src/dist/output/analysis/propagation/
-/simulator/src/dist/output/analysis/propagation/*
-!/simulator/src/dist/output/analysis/propagation/.gitkeep
+!/simulator/src/dist/output/propagation/
+/simulator/src/dist/output/propagation/*
+!/simulator/src/dist/output/propagation/.gitkeep
 
 
 #for MacOS
