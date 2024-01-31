@@ -97,9 +97,9 @@ public class Main {
             .replace("file:", "");
 
     static BasicLogger logger = BasicLogger.getLogger("simblock.output");
-    static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
     static BasicLogger hashrateLogger = BasicLogger.getLogger("simblock.hashrate");
     static BasicLogger mainChainMinerLogger = BasicLogger.getLogger("simblock.mainChainMiner");
+    static BasicLogger propagationLogger = BasicLogger.getLogger("simblock.propagation");
 
     /* Parse command line option */
     private static void parseOption(String[] args) {
