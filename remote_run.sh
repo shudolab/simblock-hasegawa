@@ -5,12 +5,16 @@
 # gradleでbuild
 ./gradlew build --quiet
 
-PROPERTIES_FILE_NAMES=("base" "light" "initial")
+# 引数からプロパティファイル名を取得
+if [ "$#" -eq 0 ]; then
+    PROPERTIES_FILE_NAMES=("base")
+else
+    PROPERTIES_FILE_NAMES=("$@")
+fi
 
 for properties in "${PROPERTIES_FILE_NAMES[@]}"; do
-
     OPTION="-properties $properties"
 
     # gradleを使わずに実行
-    O=log qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main $OPTION
+    qcmd java -classpath simulator/build/classes/java/main/:simulator/src/dist/conf/ simblock.simulator.Main $OPTION
 done
