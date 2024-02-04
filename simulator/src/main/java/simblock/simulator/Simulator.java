@@ -315,7 +315,7 @@ public class Simulator {
         for (double winningRate : winningRateList) {
             ArrayList<Double> fairnessList = calculateFairness(winningRate);
             double sumFairness = 0;
-            double maxFairness = Double.MIN_VALUE;
+            double maxFairness = -Double.MAX_VALUE;
             double minFairness = Double.MAX_VALUE;
             int maxFairnessIndex = 0;
             int minFairnessIndex = 0;
@@ -403,8 +403,8 @@ public class Simulator {
                         * ((double) hashrateList.get(i) / hashrateSum)
                         * propagationTimeBetweenNodes[j][i];
             }
-            fairness -= (double) hashrateList.get(i) / hashrateSum;
             fairness /= targetInterval;
+            fairness -= (double) hashrateList.get(i) / hashrateSum;
             fairnessList.add(fairness);
         }
 
