@@ -352,7 +352,7 @@ public class Simulator {
             for (int j = 0; j < propagationTimeBetweenNodes[i].length; j++) {
                 hWPropSum += propagationTimeBetweenNodes[i][j] * hashrateList.get(j);
             }
-            hWPropSum /= hashrateSum;
+            hWPropSum /= (double) hashrateSum;
             hWPropSumList.add(hWPropSum);
         }
 
@@ -361,13 +361,15 @@ public class Simulator {
         // ハッシュレートの割合で初期化
         for (int i = 0; i < minerCount.size(); i++) {
             ArrayList<Double> tmp = new ArrayList<>();
-            tmp.add((double) hashrateList.get(i) / hashrateSum);
-            tmp.add((double) hashrateList.get(i) / hashrateSum);
+            // tmp.add((double) hashrateList.get(i) / hashrateSum);
+            // tmp.add((double) hashrateList.get(i) / hashrateSum);
+            tmp.add((double) 1.0 / hashrateList.size());
+            tmp.add((double) 1.0 / hashrateList.size());
             generateRate.add(tmp);
         }
 
         // 定常分布を求める
-        int loopCount = 20;
+        int loopCount = 1000;
         for (int i = 0; i < loopCount; i++) {
             for (int j = 0; j < getNumOfNodes(); j++) {
                 double updateFactor = 0;
@@ -375,6 +377,7 @@ public class Simulator {
                     updateFactor += generateRate.get(k).get((i + 1) % 2)
                             * (targetInterval - propagationTimeBetweenNodes[k][j] + hWPropSumList.get(k));
                 }
+                updateFactor *= hashrateList.get(j);
                 updateFactor /= targetInterval * hashrateSum;
                 generateRate.get(j).set(i % 2, updateFactor);
             }

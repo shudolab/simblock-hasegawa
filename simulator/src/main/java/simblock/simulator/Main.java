@@ -93,7 +93,7 @@ public class Main {
     private static String outputFileName = "output";
     private static String propagationFileName = "propagation";
     private static String resultFileName = "result";
-    private static String propertiesFilePath = (PROPERTIES_FILE_URI + "base.properties").toString()
+    private static String propertiesFilePath = (PROPERTIES_FILE_URI + "initial.properties").toString()
             .replace("file:", "");
 
     static BasicLogger logger = BasicLogger.getLogger("simblock.output");
