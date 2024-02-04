@@ -386,14 +386,15 @@ public class Simulator {
         // fairnessを計算
         ArrayList<Double> fairnessList = new ArrayList<>();
         for (int i = 0; i < getNumOfNodes(); i++) {
-            double fairness = generateRate.get(i).get(loopCount % 2) * winningRate
+            double fairness = generateRate.get(i).get(loopCount % 2)
                     * (targetInterval - (1 - winningRate) * hWPropSumList.get(i));
             for (int j = 0; j < getNumOfNodes(); j++) {
-                fairness += generateRate.get(j).get(loopCount % 2) * (1 - winningRate) * hashrateList.get(i)
+                fairness += generateRate.get(j).get(loopCount % 2) * (1 - winningRate)
+                        * ((double) hashrateList.get(i) / hashrateSum)
                         * propagationTimeBetweenNodes[j][i];
             }
-            fairness -= hashrateList.get(i);
-            fairness /= targetInterval * hashrateSum;
+            fairness -= (double) hashrateList.get(i) / hashrateSum;
+            fairness /= targetInterval;
             fairnessList.add(fairness);
         }
 
