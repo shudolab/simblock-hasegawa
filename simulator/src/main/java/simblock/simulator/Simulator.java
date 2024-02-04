@@ -317,16 +317,28 @@ public class Simulator {
             double sumFairness = 0;
             double maxFairness = Double.MIN_VALUE;
             double minFairness = Double.MAX_VALUE;
+            int maxFairnessIndex = 0;
+            int minFairnessIndex = 0;
 
             for (int i = 0; i < fairnessList.size(); i++) {
-                sumFairness += fairnessList.get(i);
-                maxFairness = Math.max(maxFairness, fairnessList.get(i));
-                minFairness = Math.min(minFairness, fairnessList.get(i));
+                if (fairnessList.get(i) > 0) {
+                    sumFairness += fairnessList.get(i);
+                }
+                if (fairnessList.get(i) > maxFairness) {
+                    maxFairness = fairnessList.get(i);
+                    maxFairnessIndex = i;
+                }
+                if (fairnessList.get(i) < minFairness) {
+                    minFairness = fairnessList.get(i);
+                    minFairnessIndex = i;
+                }
             }
+            maxFairness *= hashrateSum / hashrateList.get(maxFairnessIndex);
+            minFairness *= hashrateSum / hashrateList.get(minFairnessIndex);
 
-            resultLogger.print("\"sum-fairness-win" + winningRate + "\" :" + sumFairness + ",\n");
-            resultLogger.print("\"max-fairness-win" + winningRate + "\" :" + maxFairness + ",\n");
-            resultLogger.print("\"min-fairness-win" + winningRate + "\" :" + minFairness + ",\n");
+            resultLogger.print("\"sum-base-fairness-win" + winningRate + "\" :" + sumFairness + ",\n");
+            resultLogger.print("\"max-base-fairness-win" + winningRate + "\" :" + maxFairness + ",\n");
+            resultLogger.print("\"min-base-fairness-win" + winningRate + "\" :" + minFairness + ",\n");
             resultLogger.print("\"fairness-list-win" + winningRate + "\" :" + fairnessList + ",\n");
         }
 
@@ -361,10 +373,8 @@ public class Simulator {
         // ハッシュレートの割合で初期化
         for (int i = 0; i < minerCount.size(); i++) {
             ArrayList<Double> tmp = new ArrayList<>();
-            // tmp.add((double) hashrateList.get(i) / hashrateSum);
-            // tmp.add((double) hashrateList.get(i) / hashrateSum);
-            tmp.add((double) 1.0 / hashrateList.size());
-            tmp.add((double) 1.0 / hashrateList.size());
+            tmp.add((double) hashrateList.get(i) / hashrateSum);
+            tmp.add((double) hashrateList.get(i) / hashrateSum);
             generateRate.add(tmp);
         }
 
