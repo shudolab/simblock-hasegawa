@@ -94,7 +94,7 @@ public class Simulator {
     /**
      * マイナーiが生成したブロックの数
      */
-    private static long[] minerCount = new long[getNumOfNodes()];
+    private static ArrayList<Long> minerCount = new ArrayList<>();
 
     /**
      * Get simulated nodes list.
@@ -132,6 +132,7 @@ public class Simulator {
         simulatedNodes.add(node);
         hashrateList.add(node.getMiningPower());
         hashrateSum += node.getMiningPower();
+        minerCount.add(0L);
     }
 
     /**
@@ -250,7 +251,7 @@ public class Simulator {
         long[] nodePropagationTimes = new long[getNumOfNodes()];
 
         int minerIndex = block.getMinter().getNodeID() - 1;
-        minerCount[minerIndex]++;
+        minerCount.set(minerIndex, minerCount.get(minerIndex) + 1);
 
         int index = 1;
         for (Map.Entry<Integer, Long> timeEntry : propagation.entrySet()) {
@@ -302,18 +303,6 @@ public class Simulator {
         average100PropagationTime /= blockSum;
         averageMeanPropagationTime /= blockSum;
         averageHashrateWeightedPropagationTime /= blockSum;
-
-        ArrayList<Double> fairnessList = calculateFairness();
-        double sumFairness = 0;
-        double maxFairness = Double.MIN_VALUE;
-        double minFairness = Double.MAX_VALUE;
-
-        for (int i = 0; i < fairnessList.size(); i++) {
-            sumFairness += fairnessList.get(i);
-            maxFairness = Math.max(maxFairness, fairnessList.get(i));
-            minFairness = Math.min(minFairness, fairnessList.get(i));
-        }
-
         resultLogger.print("{\n");
         resultLogger.print("\"average-50-propagation-time\" :" + average50PropagationTime + ",\n");
         resultLogger.print("\"average-90-propagation-time\" :" + average90PropagationTime + ",\n");
@@ -322,22 +311,37 @@ public class Simulator {
         resultLogger
                 .print("\"average-hashrate-weighted-propagation-time\" :" + averageHashrateWeightedPropagationTime
                         + ",\n");
-        resultLogger.print("\"sum-fairness\" :" + sumFairness + ",\n");
-        resultLogger.print("\"max-fairness\" :" + maxFairness + ",\n");
-        resultLogger.print("\"min-fairness\" :" + minFairness + ",\n");
-        resultLogger.print("\"fairness-list\" :" + fairnessList + ",\n");
+        double[] winningRateList = { 0, 0.5, 1.0 };
+        for (double winningRate : winningRateList) {
+            ArrayList<Double> fairnessList = calculateFairness(winningRate);
+            double sumFairness = 0;
+            double maxFairness = Double.MIN_VALUE;
+            double minFairness = Double.MAX_VALUE;
+
+            for (int i = 0; i < fairnessList.size(); i++) {
+                sumFairness += fairnessList.get(i);
+                maxFairness = Math.max(maxFairness, fairnessList.get(i));
+                minFairness = Math.min(minFairness, fairnessList.get(i));
+            }
+
+            resultLogger.print("\"sum-fairness-win" + winningRate + "\" :" + sumFairness + ",\n");
+            resultLogger.print("\"max-fairness-win" + winningRate + "\" :" + maxFairness + ",\n");
+            resultLogger.print("\"min-fairness-win" + winningRate + "\" :" + minFairness + ",\n");
+            resultLogger.print("\"fairness-list-win" + winningRate + "\" :" + fairnessList + ",\n");
+        }
+
         resultLogger.print("\"hashrate-list\" :" + hashrateList + ",\n");
         resultLogger.print("\"block-generation-count-list\" :" + minerCount);
         resultLogger.print("\n}");
     }
 
-    private static ArrayList<Double> calculateFairness() {
+    private static ArrayList<Double> calculateFairness(double winningRate) {
         // マイナーiがブロックを生成した時にマイナーjがそのブロックを受け取るまでの時間の平均を計算
         for (int i = 0; i < propagationTimeBetweenNodes.length; i++) {
-            if (minerCount[i] == 0)
+            if (minerCount.get(i) == 0)
                 continue;
             for (int j = 0; j < propagationTimeBetweenNodes[i].length; j++) {
-                propagationTimeBetweenNodes[i][j] /= minerCount[i];
+                propagationTimeBetweenNodes[i][j] /= minerCount.get(i);
             }
         }
 
@@ -355,7 +359,7 @@ public class Simulator {
         // 各マイナーがブロックを生成する確率、更新のため直近の結果を保持する2次元配列とする
         ArrayList<ArrayList<Double>> generateRate = new ArrayList<>();
         // ハッシュレートの割合で初期化
-        for (int i = 0; i < minerCount.length; i++) {
+        for (int i = 0; i < minerCount.size(); i++) {
             ArrayList<Double> tmp = new ArrayList<>();
             tmp.add((double) hashrateList.get(i) / hashrateSum);
             tmp.add((double) hashrateList.get(i) / hashrateSum);
@@ -378,7 +382,6 @@ public class Simulator {
 
         // fairnessを計算
         ArrayList<Double> fairnessList = new ArrayList<>();
-        double winningRate = 0.5;
         for (int i = 0; i < getNumOfNodes(); i++) {
             double fairness = generateRate.get(i).get(loopCount % 2) * winningRate
                     * (targetInterval - (1 - winningRate) * hWPropSumList.get(i));
